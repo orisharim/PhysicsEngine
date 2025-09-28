@@ -4,7 +4,7 @@
 #include "geometry_utils.h"
 #include "float.h"
 #include <stdio.h>
-
+#include <math.h>
 
 Collider2D rect_collider_create(float width, float height){
     RectCollider square_collider = (RectCollider) {width, height };
@@ -126,6 +126,50 @@ CollisionResult collision_check_rects(RectCollider a_collider, Vector2D a_pos, f
 
 }
 
+CollisionResult collision_check_rect_circle(RectCollider rect, Vector2D rect_pos, float rect_angle,
+                                            CircleCollider circle, Vector2D circle_pos) {
+    CollisionResult result;
+    result.did_collide = false;
+    result.normal_vec = vec_2d(0, 0);
+    result.penetration = 0;
+
+    Vector2D corners[4];
+    get_rect_corners(rect_pos, rect_angle, rect.width, rect.height, corners);
+
+    Vector2D axis_x = vec_2d_normalize(vec_2d_sub(corners[1], corners[0]));
+    Vector2D axis_y = vec_2d_normalize(vec_2d_sub(corners[3], corners[0]));
+
+    Vector2D rel = vec_2d_sub(circle_pos, rect_pos);
+
+    float half_w = rect.width * 0.5f;
+    float half_h = rect.height * 0.5f;
+
+    float proj_x = vec_2d_dot(rel, axis_x);
+    float proj_y = vec_2d_dot(rel, axis_y);
+
+    float clamped_x = fmaxf(-half_w, fminf(proj_x, half_w));
+    float clamped_y = fmaxf(-half_h, fminf(proj_y, half_h));
+
+    Vector2D closest = vec_2d_add(rect_pos,
+                                  vec_2d_add(vec_2d_scale(axis_x, clamped_x),
+                                             vec_2d_scale(axis_y, clamped_y)));
+
+    Vector2D diff = vec_2d_sub(circle_pos, closest);
+    float dist = vec_2d_length(diff);
+
+    if (dist < circle.radius) {
+        result.did_collide = true;
+        result.penetration = circle.radius - dist;
+
+        if (dist == 0) {
+            result.normal_vec = vec_2d(1, 0);
+        } else {
+            result.normal_vec = vec_2d_scale(diff, 1.0f / dist);
+        }
+    }
+
+    return result;
+}
 
 CollisionResult collision_2d_check(Collider2D a_collider, Vector2D a_pos, float a_angle,
                                      Collider2D b_collider, Vector2D b_pos, float b_angle){
@@ -136,11 +180,12 @@ CollisionResult collision_2d_check(Collider2D a_collider, Vector2D a_pos, float 
     else if(a_collider.type == RECT_COLLIDER && b_collider.type == RECT_COLLIDER){
         res = collision_check_rects(a_collider.rect, a_pos, a_angle, b_collider.rect, b_pos, b_angle);
     }
-    // TODO
     else if(a_collider.type == RECT_COLLIDER && b_collider.type == CIRCLE_COLLIDER){
+        res = collision_check_rect_circle(a_collider.rect, a_pos, a_angle, b_collider.circle, b_pos);
     }
     else if(a_collider.type == CIRCLE_COLLIDER && b_collider.type == RECT_COLLIDER){
-        
+        res = collision_check_rect_circle(b_collider.rect, b_pos, b_angle, a_collider.circle, a_pos);
+        res.normal_vec = vec_2d_scale(res.normal_vec, -1.0f);
     }
     return res;
 }

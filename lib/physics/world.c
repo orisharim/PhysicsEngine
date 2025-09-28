@@ -237,7 +237,6 @@ void world_2d_step(World2D* world, float delta_time) {
                 handle_static_collision(a->rigidbody, b->staticbody);
             } 
             else if (a->type == STATICBODY && b->type == STATICBODY) {
-                // handle_static_collision(a, objB.staticbody);
             }
         }
     }
