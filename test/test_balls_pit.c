@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define CUBE_SIZE    30.0f
+#define BALL_RADIUS  15.0f
 #define SPAWN_COUNT  50
 #define SPAWN_DELAY  0.1f
 #define GRAVITY      300.0f
 
 int main(void) {
-    InitWindow(1200, 1000, "Cube Pool Test");
+    InitWindow(1200, 1000, "Ball Pool Test");
 
     World2D* world = world_2d_create(100);
 
@@ -21,8 +21,8 @@ int main(void) {
 
     world_2d_set_gravity(world, GRAVITY, vec_2d(0, 1));
 
-    // Cube array
-    Rigidbody2D* cubes[SPAWN_COUNT] = {0};
+    // Ball array
+    Rigidbody2D* balls[SPAWN_COUNT] = {0};
     float spawn_timer = 0;
     int spawned = 0;
 
@@ -32,26 +32,26 @@ int main(void) {
         float dt = GetFrameTime();
         spawn_timer += dt;
 
-        // Spawn cubes over time
+        // Spawn balls over time
         if (spawned < SPAWN_COUNT && spawn_timer >= SPAWN_DELAY) {
             spawn_timer = 0;
 
-            Rigidbody2D* cube = (Rigidbody2D*)malloc(sizeof(Rigidbody2D));
+            Rigidbody2D* ball = (Rigidbody2D*)malloc(sizeof(Rigidbody2D));
             rigid_body_2d_init(
-                cube,
+                ball,
                 1.0f,
                 vec_2d(600 + (rand() % 100 - 50), 50),
                 0,
-                rect_collider_create(CUBE_SIZE, CUBE_SIZE)
+                circle_collider_create(BALL_RADIUS)
             );
-            rigid_body_2d_set_material(cube, (Material2D){0.2f, 0.2f}); // bounciness and friction
-            world_2d_add_rigid_body(world, cube);
+            rigid_body_2d_set_material(ball, (Material2D){0.4f, 0.2f}); // bounciness, friction
+            world_2d_add_rigid_body(world, ball);
 
-            cubes[spawned] = cube;
+            balls[spawned] = ball;
             spawned++;
         }
 
-        float substep_amount = 10.0f;
+        int substep_amount = 10;
         for (int i = 0; i < substep_amount; i++) {
             world_2d_step(world, dt / substep_amount);
         }
@@ -64,14 +64,13 @@ int main(void) {
         // Draw ground
         DrawRectangle(ground->pos.x - 600, ground->pos.y - 20, 1200, 40, WHITE);
 
-        // Draw cubes
+        // Draw balls
         for (int i = 0; i < spawned; i++) {
-            if (cubes[i]) {
-                DrawRectangle(
-                    cubes[i]->pos.x - CUBE_SIZE/2,
-                    cubes[i]->pos.y - CUBE_SIZE/2,
-                    CUBE_SIZE,
-                    CUBE_SIZE,
+            if (balls[i]) {
+                DrawCircle(
+                    (int)balls[i]->pos.x,
+                    (int)balls[i]->pos.y,
+                    BALL_RADIUS,
                     RED
                 );
             }

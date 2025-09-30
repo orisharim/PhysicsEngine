@@ -23,7 +23,7 @@ Collider2D circle_collider_create(float radius){
 }
 
 CollisionResult collision_check_circles(CircleCollider a_collider, Vector2D a_pos,
-                                     CircleCollider b_collider, Vector2D b_pos) {
+                                        CircleCollider b_collider, Vector2D b_pos) {
     CollisionResult result;
     result.normal_vec = vec_2d(0, 0);
     result.did_collide = false;
@@ -32,25 +32,25 @@ CollisionResult collision_check_circles(CircleCollider a_collider, Vector2D a_po
     float radius_a = a_collider.radius;
     float radius_b = b_collider.radius;
 
-    Vector2D dis = vec_2d_sub(a_pos, b_pos);
+    Vector2D dis = vec_2d_sub(b_pos, a_pos); 
     float dist = vec_2d_length(dis);
 
-    result.penetration = radius_a + radius_b - dist;
+    float total_radius = radius_a + radius_b;
+    result.penetration = total_radius - dist;
 
-    if(result.penetration > 0){
+    if (result.penetration > 0) {
         result.did_collide = true;
 
-        if(dist == 0.0f){
-            //if circles are in the same pos apply force in a random direction
+        if (dist == 0.0f) {
             result.normal_vec = vec_2d(1, 0);
         } else {
-            result.normal_vec = vec_2d_normalize(dis);
+            result.normal_vec = vec_2d_scale(dis, 1.0f / dist); 
         }
-
     }
 
     return result;
 }
+
 
 // project the corners of a shape on an axis and return the min and max values 
 void project_shape_corners_on_axis(Vector2D* corners, int count, Vector2D axis, float* out_min, float* out_max) {
