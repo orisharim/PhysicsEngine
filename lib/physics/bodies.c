@@ -34,7 +34,7 @@ void rigid_body_2d_set_velocity(Rigidbody2D* body, Vector2D velocity){
 }
 
 void rigid_body_2d_update(Rigidbody2D* body, float delta_time){
-    body->vel = vec_2d_add(body->vel, vec_2d_scale(body->force, (1.0f/(body->mass)) * delta_time)); // vel = vel_0 + f/m * dt
+    body->vel = vec_2d_add(body->vel, vec_2d_scale(body->force, (1.0f/(body->mass)) * delta_time));
     body->pos = vec_2d_add(body->pos, vec_2d_scale(body->vel, delta_time));
     rigid_body_2d_clear_forces(body);
 }
@@ -74,8 +74,39 @@ static Vector2D calculate_impulse_after_collision(Vector2D collision_normal, flo
     return vec_2d_scale(collision_normal, impulse_factor);
 }
 
-
-void handle_rigid_body_collision(Rigidbody2D* a, Rigidbody2D* b) {
+void rigid_body_2d_handle_friction(Rigidbody2D* a, Vector2D collision_normal, float friction_b){
+    float friction = fminf(a->material.friction, friction_b);
+    float force_along_normal = vec_2d_dot(a->force, collision_normal);
+    
+    Vector2D friction_direction = vec_2d(-collision_normal.y, collision_normal.x);
+    
+    float vel_along_friction = vec_2d_dot(a->vel, friction_direction);
+    float force_along_friction = vec_2d_dot(a->force, friction_direction);
+    
+    // make sure friction opposes velocity direction
+    if(vel_along_friction > 0)
+        friction_direction = vec_2d_scale(friction_direction, -1.0f);
+    
+    Vector2D friction_force;
+    
+    if(fabsf(vel_along_friction) < 0.001f) {
+        float max_static = force_along_normal * friction;
+        
+        if(fabsf(force_along_friction) <= max_static) {
+            //kinetic friction
+            friction_force = vec_2d_scale(vec_2d(-collision_normal.y, collision_normal.x), -force_along_friction);
+        } else {
+            // kinetic friction
+            friction_force = vec_2d_scale(friction_direction, force_along_normal * friction);
+        }
+    } else {
+        //kinetic friction
+        friction_force = vec_2d_scale(friction_direction, force_along_normal * friction);
+    }
+    
+    a->force = vec_2d_add(a->force, friction_force);
+}
+void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
     CollisionResult result = collision_2d_check(
         a->collider, a->pos, a->angle,
         b->collider, b->pos, b->angle
@@ -118,7 +149,7 @@ void static_body_2d_init(Staticbody2D* body, Vector2D pos, float angle,  Collide
     body->collider = collider;
 }
 
-void handle_static_body_collision(Rigidbody2D* a, Staticbody2D* b) {
+void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
     CollisionResult result = collision_2d_check(
         a->collider, a->pos, a->angle,
         b->collider, b->pos, b->angle

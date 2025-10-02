@@ -51,20 +51,15 @@ int main(void) {
             spawned++;
         }
 
-        int substep_amount = 10;
-        for (int i = 0; i < substep_amount; i++) {
-            world_2d_step(world, dt / substep_amount);
-        }
+        world_2d_step_with_substeps(world, dt, 10);
 
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
         DrawText(TextFormat("FPS: %d", GetFPS()), 20, 20, 20, WHITE);
 
-        // Draw ground
         DrawRectangle(ground->pos.x - 600, ground->pos.y - 20, 1200, 40, WHITE);
 
-        // Draw balls
         for (int i = 0; i < spawned; i++) {
             if (balls[i]) {
                 DrawCircle(

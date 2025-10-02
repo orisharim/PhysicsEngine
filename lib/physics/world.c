@@ -143,7 +143,11 @@ static void apply_gravity(World2D* world) {
     }
 }
 
-
+void world_2d_step_with_substeps(World2D* world, float delta_time, int substep_amount){
+    for(int i = 0; i < substep_amount; i++){
+        world_2d_step(world, delta_time / substep_amount);
+    }
+}
 
 void world_2d_step(World2D* world, float delta_time) {
     apply_gravity(world);
@@ -159,11 +163,11 @@ void world_2d_step(World2D* world, float delta_time) {
             if(a == b)
                 continue;
             if (a->type == RIGIDBODY && b->type == RIGIDBODY) 
-                handle_rigid_body_collision(a->rigidbody, b->rigidbody); 
+                rigid_body_2d_handle_collision(a->rigidbody, b->rigidbody); 
             else if (a->type == STATICBODY && b->type == RIGIDBODY) 
-                handle_static_body_collision(b->rigidbody, a->staticbody);
+                rigid_body_2d_handle_static_collision(b->rigidbody, a->staticbody);
             else if (a->type == RIGIDBODY && b->type == STATICBODY) 
-                handle_static_body_collision(a->rigidbody, b->staticbody); 
+                rigid_body_2d_handle_static_collision(a->rigidbody, b->staticbody); 
             else if (a->type == STATICBODY && b->type == STATICBODY) 
                 continue;
         }

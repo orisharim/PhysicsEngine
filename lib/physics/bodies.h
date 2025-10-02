@@ -6,7 +6,7 @@
 
 typedef struct Material2D{
     float bounciness;
-    float friction;
+    float friction; //its both the static kinetic coefs for now 
 } Material2D;
 
 typedef struct Rigidbody2D{
@@ -28,7 +28,7 @@ void rigid_body_2d_clear_forces(Rigidbody2D* body);
 void rigid_body_2d_set_material(Rigidbody2D* body, Material2D material);
 void rigid_body_2d_set_velocity(Rigidbody2D* body, Vector2D velocity);
 void rigid_body_2d_update(Rigidbody2D* body, float delta_time);
-void handle_rigid_body_collision(Rigidbody2D* a, Rigidbody2D* b);
+void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b);
 
 typedef struct Staticbody2D{
     Vector2D pos;
@@ -39,7 +39,7 @@ typedef struct Staticbody2D{
 } Staticbody2D;
 
 void static_body_2d_init(Staticbody2D* body, Vector2D pos, float angle,  Collider2D collider);
-void handle_static_body_collision(Rigidbody2D* a, Staticbody2D* b); 
+void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b); 
 
 #endif
 
