@@ -7,6 +7,8 @@
 #define OVERLAP_FIX_RATIO 0.8f
 #define OVERLAP_TOLERANCE 0.01f
 
+#define MIN_VELOCITY_THRESHOLD 0.001f
+
 void rigid_body_2d_init(Rigidbody2D* body, float mass, Vector2D pos, float angle,  Collider2D collider){
     body->mass = mass;
     body->pos = pos;
@@ -78,7 +80,7 @@ void rigid_body_2d_handle_friction(Rigidbody2D* a, Vector2D collision_normal, fl
     float friction = fminf(a->material.friction, friction_b);
     float force_along_normal = vec_2d_dot(a->force, collision_normal);
     
-    Vector2D friction_direction = vec_2d(-collision_normal.y, collision_normal.x);
+    Vector2D friction_direction = vec_2d(-collision_normal.y, collision_normal.x); // rotate by 90 degrees 
     
     float vel_along_friction = vec_2d_dot(a->vel, friction_direction);
     float force_along_friction = vec_2d_dot(a->force, friction_direction);
@@ -89,22 +91,18 @@ void rigid_body_2d_handle_friction(Rigidbody2D* a, Vector2D collision_normal, fl
     
     Vector2D friction_force;
     
-    if(fabsf(vel_along_friction) < 0.001f) {
-        float max_static = force_along_normal * friction;
-        
-        if(fabsf(force_along_friction) <= max_static) {
-            //kinetic friction
-            friction_force = vec_2d_scale(vec_2d(-collision_normal.y, collision_normal.x), -force_along_friction);
-        } else {
-            // kinetic friction
-            friction_force = vec_2d_scale(friction_direction, force_along_normal * friction);
-        }
+    if(fabsf(vel_along_friction) < MIN_VELOCITY_THRESHOLD && fabsf(force_along_friction) <= force_along_normal * friction) {
+        //static friction
+        friction_force = vec_2d_scale(friction_direction, -force_along_friction);
     } else {
         //kinetic friction
         friction_force = vec_2d_scale(friction_direction, force_along_normal * friction);
     }
     
     a->force = vec_2d_add(a->force, friction_force);
+    // printf("(%f, %f) \n", friction_force.x, friction_force.y);
+    printf("%f \n", force_along_normal);
+
 }
 void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
     CollisionResult result = collision_2d_check(
@@ -113,9 +111,9 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
     );
 
     if (result.did_collide) {
-        correct_overlapping(result, &a->pos, 1.0f / a->mass,
-                                     &b->pos, 1.0f / b->mass);
         
+                rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
+
 
         
         Vector2D impulse = calculate_impulse_after_collision(
@@ -128,6 +126,7 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
         a->vel = vec_2d_sub(a->vel, vec_2d_scale(impulse, 1.0f / a->mass));
         b->vel = vec_2d_add(b->vel, vec_2d_scale(impulse, 1.0f / b->mass));
 
+
         //remove force along the collision normal vecotr
         float force_along_normal_a = vec_2d_dot(a->force, result.normal_vec);
         if (force_along_normal_a > 0.0f) {
@@ -137,7 +136,10 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
         float force_along_normal_b = vec_2d_dot(b->force, result.normal_vec);
         if (force_along_normal_b < 0.0f) {
             b->force = vec_2d_sub(b->force, vec_2d_scale(result.normal_vec, force_along_normal_b));
-        }            
+        }    
+        
+        correct_overlapping(result, &a->pos, 1.0f / a->mass,
+                                     &b->pos, 1.0f / b->mass);
         
     }
 
@@ -156,7 +158,8 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
     );
 
     if (result.did_collide) {
-        correct_overlapping(result, &a->pos, 1.0f / a->mass, NULL, 0.0f);
+
+                rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
 
         
         Vector2D impulse = calculate_impulse_after_collision(
@@ -168,10 +171,18 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
 
         a->vel = vec_2d_sub(a->vel, vec_2d_scale(impulse, 1.0f / a->mass));
 
+
         float force_along_normal_axis = vec_2d_dot(a->force, result.normal_vec);
         if (force_along_normal_axis > 0.0f) {
             a->force = vec_2d_sub(a->force, vec_2d_scale(result.normal_vec, force_along_normal_axis));
         }
+        correct_overlapping(result, &a->pos, 1.0f / a->mass, NULL, 0.0f);
+
 
     }
 }
+
+void static_body_2d_set_material(Staticbody2D* body, Material2D material){
+    body->material = material;
+}
+

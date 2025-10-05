@@ -17,6 +17,7 @@ int main(void) {
     // Create ground
     Staticbody2D* ground = (Staticbody2D*)malloc(sizeof(Staticbody2D));
     static_body_2d_init(ground, vec_2d(600, 950), 0, rect_collider_create(1200, 40));
+    static_body_2d_set_material(ground, (Material2D){0.5f, 0.5f});
     world_2d_add_static_body(world, ground);
 
     world_2d_set_gravity(world, GRAVITY, vec_2d(0, 1));
@@ -44,7 +45,7 @@ int main(void) {
                 0,
                 circle_collider_create(BALL_RADIUS)
             );
-            rigid_body_2d_set_material(ball, (Material2D){0.4f, 0.2f}); // bounciness, friction
+            rigid_body_2d_set_material(ball, (Material2D){0.4f, 1.0f}); // bounciness, friction
             world_2d_add_rigid_body(world, ball);
 
             balls[spawned] = ball;

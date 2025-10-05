@@ -8,7 +8,8 @@
 
 World2D* world_2d_create(int initial_capacity) {
     World2D* world = malloc(sizeof(World2D));
-    if (!world) return NULL;
+    if (!world) 
+        return NULL;
 
     world->objects = malloc(sizeof(PhysicsObject) * initial_capacity);
     world->count = 0;
