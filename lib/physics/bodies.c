@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define OVERLAP_FIX_RATIO 0.8f
+#define OVERLAP_FIX_RATIO 0.2f
 #define OVERLAP_TOLERANCE 0.01f
 
 #define MIN_VELOCITY_THRESHOLD 0.001f
@@ -112,9 +112,8 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
 
     if (result.did_collide) {
         
-                rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
-
-
+        
+        rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
         
         Vector2D impulse = calculate_impulse_after_collision(
             result.normal_vec,
@@ -126,6 +125,8 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
         a->vel = vec_2d_sub(a->vel, vec_2d_scale(impulse, 1.0f / a->mass));
         b->vel = vec_2d_add(b->vel, vec_2d_scale(impulse, 1.0f / b->mass));
 
+        correct_overlapping(result, &a->pos, 1.0f / a->mass,
+                                     &b->pos, 1.0f / b->mass);
 
         //remove force along the collision normal vecotr
         float force_along_normal_a = vec_2d_dot(a->force, result.normal_vec);
@@ -138,8 +139,8 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
             b->force = vec_2d_sub(b->force, vec_2d_scale(result.normal_vec, force_along_normal_b));
         }    
         
-        correct_overlapping(result, &a->pos, 1.0f / a->mass,
-                                     &b->pos, 1.0f / b->mass);
+        
+
         
     }
 
@@ -159,9 +160,8 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
 
     if (result.did_collide) {
 
-                rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
+        rigid_body_2d_handle_friction(a, result.normal_vec, b->material.friction);
 
-        
         Vector2D impulse = calculate_impulse_after_collision(
             result.normal_vec,
             a->material.bounciness, b->material.bounciness,
@@ -171,13 +171,14 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
 
         a->vel = vec_2d_sub(a->vel, vec_2d_scale(impulse, 1.0f / a->mass));
 
+        correct_overlapping(result, &a->pos, 1.0f / a->mass, NULL, 0.0f);
+
 
         float force_along_normal_axis = vec_2d_dot(a->force, result.normal_vec);
         if (force_along_normal_axis > 0.0f) {
             a->force = vec_2d_sub(a->force, vec_2d_scale(result.normal_vec, force_along_normal_axis));
         }
-        correct_overlapping(result, &a->pos, 1.0f / a->mass, NULL, 0.0f);
-
+        
 
     }
 }

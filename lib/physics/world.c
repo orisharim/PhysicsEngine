@@ -153,8 +153,8 @@ void world_2d_step_with_substeps(World2D* world, float delta_time, int substep_a
 void world_2d_step(World2D* world, float delta_time) {
     apply_gravity(world);
 
-    update_rigidbodies_values(world, delta_time);
 
+    
     for (int i = 0; i < world->count; i++) {
         PhysicsObject* a = world->objects + i;
 
@@ -173,5 +173,10 @@ void world_2d_step(World2D* world, float delta_time) {
                 continue;
         }
     }
+
+        update_rigidbodies_values(world, delta_time);
+
 }
+
+
 
