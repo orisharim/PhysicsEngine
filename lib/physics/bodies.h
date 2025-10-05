@@ -15,6 +15,7 @@ typedef struct Rigidbody2D{
     Vector2D pos;
     Vector2D vel;
     Vector2D force;
+    Vector2D last_force;
 
     float angle; //radians
 

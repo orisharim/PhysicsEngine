@@ -123,7 +123,8 @@ CollisionResult world_2d_check_collision_static_body_static_body(Staticbody2D* a
 static Vector2D get_gravity_force(World2D* world, float mass) {
     return vec_2d_scale(vec_2d_normalize(world->gravity_dir),
                         mass * world->gravity_constant);
-}
+}    
+
 
 static void update_rigidbodies_values(World2D* world, float delta_time){
     for (int i = 0; i < world->count; i++) {
@@ -132,7 +133,9 @@ static void update_rigidbodies_values(World2D* world, float delta_time){
             rigid_body_2d_update(obj->rigidbody, delta_time);
         }
     }
+
 }
+
 
 static void apply_gravity(World2D* world) {
     for (int i = 0; i < world->count; i++) {
@@ -153,6 +156,7 @@ void world_2d_step_with_substeps(World2D* world, float delta_time, int substep_a
 void world_2d_step(World2D* world, float delta_time) {
     apply_gravity(world);
 
+    update_rigidbodies_values(world, delta_time);
 
     
     for (int i = 0; i < world->count; i++) {
@@ -173,8 +177,6 @@ void world_2d_step(World2D* world, float delta_time) {
                 continue;
         }
     }
-
-        update_rigidbodies_values(world, delta_time);
 
 }
 
