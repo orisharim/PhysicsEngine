@@ -43,7 +43,8 @@ CollisionResult world_2d_check_collision_rigid_body_rigid_body(Rigidbody2D* a, R
 CollisionResult world_2d_check_collision_rigid_body_static_body(Rigidbody2D* a, Staticbody2D* b);
 CollisionResult world_2d_check_collision_static_body_static_body(Staticbody2D* a, Staticbody2D* b);
 
-
 void world_2d_step(World2D* world, float delta_time);
+void world_2d_step_with_substeps(World2D* world, float delta_time, int substep_amount);
+
 
 #endif
