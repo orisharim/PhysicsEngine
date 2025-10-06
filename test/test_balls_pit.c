@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include "world.h"
-#include "bodies.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,17 +15,14 @@ int main(void) {
 
     Staticbody2D* ground = (Staticbody2D*)malloc(sizeof(Staticbody2D));
     static_body_2d_init(ground, vec_2d(600, 950), 0, rect_collider_create(1200, 40));
-    static_body_2d_set_material(ground, (Material2D){0.5f, 0.5f});
     world_2d_add_static_body(world, ground);
 
     Staticbody2D* left_wall = (Staticbody2D*)malloc(sizeof(Staticbody2D));
     static_body_2d_init(left_wall, vec_2d(-10, 500), 0, rect_collider_create(40, 1000));
-    static_body_2d_set_material(left_wall, (Material2D){0.5f, 0.5f});
     world_2d_add_static_body(world, left_wall);
 
     Staticbody2D* right_wall = (Staticbody2D*)malloc(sizeof(Staticbody2D));
     static_body_2d_init(right_wall, vec_2d(1210, 500), 0, rect_collider_create(40, 1000));
-    static_body_2d_set_material(right_wall, (Material2D){0.5f, 0.5f});
     world_2d_add_static_body(world, right_wall);
 
     world_2d_set_gravity(world, GRAVITY, vec_2d(0, 1));
@@ -53,7 +49,8 @@ int main(void) {
                 0,
                 circle_collider_create(BALL_RADIUS)
             );
-            rigid_body_2d_set_material(ball, (Material2D){0.4f, 0.0f}); // bounciness, friction
+            rigid_body_2d_set_bounciness(ball, 1.0f);
+            rigid_body_2d_set_friction(ball, 0.5f);
             world_2d_add_rigid_body(world, ball);
 
             balls[spawned] = ball;

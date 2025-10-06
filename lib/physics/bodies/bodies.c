@@ -1,45 +1,11 @@
 #include "bodies.h"
-#include "vector2.h"
-#include "collision.h"
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define OVERLAP_FIX_RATIO 0.2f
 #define OVERLAP_TOLERANCE 0.01f
 
 #define MIN_VELOCITY_THRESHOLD 0.001f
-
-void rigid_body_2d_init(Rigidbody2D* body, float mass, Vector2D pos, float angle,  Collider2D collider){
-    body->mass = mass;
-    body->pos = pos;
-    body->angle = angle;
-    body->collider = collider;
-    body->vel = vec_2d(0, 0);
-    body->force = vec_2d(0, 0);
-    body->material = (Material2D){0, 0};
-}
-
-void rigid_body_2d_add_force(Rigidbody2D* body, Vector2D force){
-    body->force = vec_2d_add(body->force, force);
-}
-
-void rigid_body_2d_clear_forces(Rigidbody2D* body){
-    body->force = vec_2d(0, 0);
-}
-
-void rigid_body_2d_set_material(Rigidbody2D* body, Material2D material){
-    body->material = material;
-}
-
-void rigid_body_2d_set_velocity(Rigidbody2D* body, Vector2D velocity){
-    body->vel = velocity;
-}
-
-void rigid_body_2d_update(Rigidbody2D* body, float delta_time){
-    body->vel = vec_2d_add(body->vel, vec_2d_scale(body->force, (1.0f/(body->mass)) * delta_time));
-    body->pos = vec_2d_add(body->pos, vec_2d_scale(body->vel, delta_time));
-    rigid_body_2d_clear_forces(body);
-}
 
 static void correct_overlapping(CollisionResult result,
                                 Vector2D* a_pos, float a_inv_mass,
@@ -94,7 +60,8 @@ static Vector2D calculate_impulse_after_collision(Vector2D collision_normal,
     return vec_2d_add(normal_impulse, friction_impulse);
 }
 
-void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
+
+void bodies_handle_collision_rigid_vs_rigid(Rigidbody2D* a, Rigidbody2D* b) {
     CollisionResult result = collision_2d_check(
         a->collider, a->pos, a->angle,
         b->collider, b->pos, b->angle
@@ -107,8 +74,8 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
         
         Vector2D impulse = calculate_impulse_after_collision(
             result.normal_vec,
-            a->material.bounciness, b->material.bounciness,
-            a->material.friction, b->material.friction,
+            a->bounciness, b->bounciness,
+            a->friction, b->friction,
             a->vel, b->vel,
             1.0f / a->mass, 1.0f / b->mass
         );
@@ -120,13 +87,7 @@ void rigid_body_2d_handle_collision(Rigidbody2D* a, Rigidbody2D* b) {
 
 }
 
-void static_body_2d_init(Staticbody2D* body, Vector2D pos, float angle,  Collider2D collider){
-    body->pos = pos;
-    body->angle = angle;
-    body->collider = collider;
-}
-
-void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
+void bodies_handle_collision_rigid_vs_static(Rigidbody2D* a, Staticbody2D* b) {
     CollisionResult result = collision_2d_check(
         a->collider, a->pos, a->angle,
         b->collider, b->pos, b->angle
@@ -138,8 +99,8 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
 
         Vector2D impulse = calculate_impulse_after_collision(
             result.normal_vec,
-            a->material.bounciness, b->material.bounciness,
-            a->material.friction, b->material.friction,
+            a->bounciness, b->bounciness,
+            a->friction, b->friction,
             a->vel, vec_2d(0.0f, 0.0f),
             1.0f / a->mass, 0.0f //we assume static bodies have infinite mass
         );
@@ -148,8 +109,3 @@ void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b) {
 
     }
 }
-
-void static_body_2d_set_material(Staticbody2D* body, Material2D material){
-    body->material = material;
-}
-

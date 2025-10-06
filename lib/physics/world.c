@@ -125,7 +125,6 @@ static Vector2D get_gravity_force(World2D* world, float mass) {
                         mass * world->gravity_constant);
 }    
 
-
 static void update_rigidbodies_values(World2D* world, float delta_time){
     for (int i = 0; i < world->count; i++) {
         PhysicsObject* obj = &world->objects[i];
@@ -135,7 +134,6 @@ static void update_rigidbodies_values(World2D* world, float delta_time){
     }
 
 }
-
 
 static void apply_gravity(World2D* world) {
     for (int i = 0; i < world->count; i++) {
@@ -168,11 +166,11 @@ void world_2d_step(World2D* world, float delta_time) {
             if(a == b)
                 continue;
             if (a->type == RIGIDBODY && b->type == RIGIDBODY) 
-                rigid_body_2d_handle_collision(a->rigidbody, b->rigidbody); 
+                bodies_handle_collision_rigid_vs_rigid(a->rigidbody, b->rigidbody); 
             else if (a->type == STATICBODY && b->type == RIGIDBODY) 
-                rigid_body_2d_handle_static_collision(b->rigidbody, a->staticbody);
+                bodies_handle_collision_rigid_vs_static(b->rigidbody, a->staticbody);
             else if (a->type == RIGIDBODY && b->type == STATICBODY) 
-                rigid_body_2d_handle_static_collision(a->rigidbody, b->staticbody); 
+                bodies_handle_collision_rigid_vs_static(a->rigidbody, b->staticbody); 
             else if (a->type == STATICBODY && b->type == STATICBODY) 
                 continue;
         }

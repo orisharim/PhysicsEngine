@@ -1,11 +1,10 @@
 CC = gcc
-CFLAGS = -Wall -O2 -I../lib/physics -I../lib/utils
+CFLAGS = -Wall -O2 -I../lib/physics -I../lib/physics/bodies -I../lib/utils 
 LIBS = -lraylib -lm -ldl -lGL -lX11
 
 SRC = test_balls_pit.c \
-      ../lib/physics/world.c \
-      ../lib/physics/bodies.c \
-      ../lib/physics/collision.c \
+      $(wildcard ../lib/physics/*.c) \
+      $(wildcard ../lib/physics/bodies/*.c) \
       $(wildcard ../lib/utils/*.c)
 
 OUT = main
