@@ -16,7 +16,6 @@ void rigid_body_2d_init(Rigidbody2D* body, float mass, Vector2D pos, float angle
     body->collider = collider;
     body->vel = vec_2d(0, 0);
     body->force = vec_2d(0, 0);
-    body->last_force = vec_2d(0, 0);
     body->material = (Material2D){0, 0};
 }
 
@@ -60,8 +59,11 @@ static void correct_overlapping(CollisionResult result,
         *b_pos = vec_2d_add(*b_pos, vec_2d_scale(correction, b_inv_mass));
 }
 
-static Vector2D calculate_impulse_after_collision(Vector2D collision_normal, float bounciness_a, float bounciness_b, float friction_a, float friction_b,
-         Vector2D vel_a, Vector2D vel_b, float inv_mass_a, float inv_mass_b){
+static Vector2D calculate_impulse_after_collision(Vector2D collision_normal,
+         float bounciness_a, float bounciness_b, 
+         float friction_a, float friction_b,
+         Vector2D vel_a, Vector2D vel_b, 
+         float inv_mass_a, float inv_mass_b){
     Vector2D relative_vel = vec_2d_sub(vel_b, vel_a);
     float vel_along_normal = vec_2d_dot(relative_vel, collision_normal);
 

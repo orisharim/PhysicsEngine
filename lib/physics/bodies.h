@@ -15,7 +15,6 @@ typedef struct Rigidbody2D{
     Vector2D pos;
     Vector2D vel;
     Vector2D force;
-    Vector2D last_force;
 
     float angle; //radians
 
@@ -42,6 +41,8 @@ typedef struct Staticbody2D{
 void static_body_2d_init(Staticbody2D* body, Vector2D pos, float angle,  Collider2D collider);
 void static_body_2d_set_material(Staticbody2D* body, Material2D material);
 void rigid_body_2d_handle_static_collision(Rigidbody2D* a, Staticbody2D* b); 
+
+
 
 #endif
 
