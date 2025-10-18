@@ -23,8 +23,8 @@ static Vector2D get_spring_applied_force(Spring2D spring){
 
 void spring_2d_update(Spring2D* spring){
     Vector2D spring_force = get_spring_applied_force(*spring);
-    rigid_body_2d_add_force(spring->point_a, spring_force);
-    rigid_body_2d_add_force(spring->point_a, vec_2d_scale(spring_force, -1.0f));
+    rigid_body_2d_add_force(spring->point_a,  vec_2d_scale(spring_force, -1.0f));
+    rigid_body_2d_add_force(spring->point_b, spring_force);
 }
 
 

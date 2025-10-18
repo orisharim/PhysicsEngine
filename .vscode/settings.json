@@ -3,6 +3,8 @@
         "stdlib.h": "c",
         "collision.h": "c",
         "staticbody.h": "c",
-        "rigidbody.h": "c"
+        "rigidbody.h": "c",
+        "vector2.h": "c",
+        "bodies.h": "c"
     }
 }

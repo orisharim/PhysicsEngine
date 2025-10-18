@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 #define BALL_RADIUS  15.0f
-#define SPAWN_COUNT  10
+#define SPAWN_COUNT  100
 #define SPAWN_DELAY  0.1f
-#define GRAVITY      300.0f
+#define GRAVITY      600.0f
 
 int main(void) {
     InitWindow(1200, 1000, "Ball Pool Test");
@@ -37,7 +37,6 @@ int main(void) {
         float dt = GetFrameTime();
         spawn_timer += dt;
 
-        // Spawn balls over time
         if (spawned < SPAWN_COUNT && spawn_timer >= SPAWN_DELAY) {
             spawn_timer = 0;
 
@@ -64,12 +63,10 @@ int main(void) {
 
         DrawText(TextFormat("FPS: %d", GetFPS()), 20, 20, 20, WHITE);
 
-        // Draw static walls and ground
         DrawRectangle(ground->pos.x - 600, ground->pos.y - 20, 1200, 40, WHITE);
         DrawRectangle(left_wall->pos.x - 20, left_wall->pos.y - 500, 40, 1000, WHITE);
         DrawRectangle(right_wall->pos.x - 20, right_wall->pos.y - 500, 40, 1000, WHITE);
 
-        // Draw balls
         for (int i = 0; i < spawned; i++) {
             if (balls[i]) {
                 DrawCircle(

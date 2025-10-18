@@ -33,6 +33,12 @@ void world_2d_destroy(World2D* world) {
             case STATICBODY:
                 free(obj->staticbody);
                 break;
+            case SOFTBODY:
+                free(obj->softbody);
+                break;
+            case SPRING:
+                free(obj->spring);
+                break;
         }
     }
 
@@ -61,6 +67,12 @@ void world_2d_remove_object(World2D* world, PhysicsObject* obj) {
                 case STATICBODY:
                     free(obj->staticbody);
                     break;
+                case SOFTBODY:
+                    free(obj->softbody);
+                    break;
+                case SPRING:
+                    free(obj->spring);
+                    break;
             }
             world->count--;
             world->objects[i] = world->objects[world->count];
@@ -78,6 +90,25 @@ PhysicsObject* world_2d_add_static_body(World2D* world, Staticbody2D* sb) {
     PhysicsObject obj = { .type = STATICBODY, .staticbody = sb };
     return world_2d_add_object(world, &obj);
 }
+
+PhysicsObject* world_2d_add_soft_body(World2D* world, Softbody2D* sb) {
+    for (int i = 0; i < sb->point_count; i++) {
+        PhysicsObject obj2 = { .type = RIGIDBODY, .rigidbody = sb->points[i] };
+        world_2d_add_object(world, &obj2); 
+    }
+
+    for (int i = 0; i < sb->spring_count; i++) {
+        PhysicsObject obj3 = { .type = SPRING, .spring = sb->springs[i] };
+        world_2d_add_object(world, &obj3);
+    }
+
+    PhysicsObject obj = { .type = SOFTBODY, .softbody = sb };
+    return world_2d_add_object(world, &obj);
+}
+
+
+
+PhysicsObject* world_2d_add_spring(World2D* world, Spring2D* sp);
 
 void world_2d_set_gravity(World2D* world, float gravity_constant, Vector2D gravity_dir) {
     world->gravity_constant = gravity_constant;
@@ -135,6 +166,15 @@ static void update_rigidbodies_values(World2D* world, float delta_time){
 
 }
 
+static void update_spring_forces(World2D* world){
+    for (int i = 0; i < world->count; i++) {
+        PhysicsObject* obj = &world->objects[i];
+        if (obj->type == SPRING) {
+            spring_2d_update(obj->spring);
+        }
+    }
+}
+
 static void apply_gravity(World2D* world) {
     for (int i = 0; i < world->count; i++) {
         PhysicsObject* obj = &world->objects[i];
@@ -153,6 +193,7 @@ void world_2d_step_with_substeps(World2D* world, float delta_time, int substep_a
 
 void world_2d_step(World2D* world, float delta_time) {
     apply_gravity(world);
+    update_spring_forces(world);
 
     update_rigidbodies_values(world, delta_time);
 

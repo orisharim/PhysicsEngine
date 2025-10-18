@@ -3,6 +3,12 @@
 
 #include "vector2.h"
 
+typedef enum {
+    RECT,
+    CIRCLE,
+    POLYGON
+} Shape2D;
+
 // get the normal vector that is perpendicular to an edge of a shape
 Vector2D get_edge_normal_vec(Vector2D corner_a, Vector2D corner_b);
 

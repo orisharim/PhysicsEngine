@@ -1,7 +1,6 @@
 #include "collision.h"
 #include "vector2.h"
 #include "bodies.h"
-#include "geometry_utils.h"
 #include "float.h"
 #include <stdio.h>
 #include <math.h>
@@ -10,7 +9,7 @@ Collider2D rect_collider_create(float width, float height){
     RectCollider square_collider = (RectCollider) {width, height };
     Collider2D collider;
     collider.rect = square_collider;
-    collider.type = RECT_COLLIDER;
+    collider.collider_shape = RECT;
     return collider;
 }
 
@@ -18,7 +17,7 @@ Collider2D circle_collider_create(float radius){
     CircleCollider circle_collider = (CircleCollider) {radius };
     Collider2D collider;
     collider.circle = circle_collider;
-    collider.type = CIRCLE_COLLIDER;
+    collider.collider_shape = CIRCLE;
     return collider;
 }
 
@@ -174,16 +173,16 @@ CollisionResult collision_check_rect_circle(RectCollider rect, Vector2D rect_pos
 CollisionResult collision_2d_check(Collider2D a_collider, Vector2D a_pos, float a_angle,
                                      Collider2D b_collider, Vector2D b_pos, float b_angle){
     CollisionResult res;
-    if(a_collider.type == CIRCLE_COLLIDER && b_collider.type == CIRCLE_COLLIDER){
+    if(a_collider.collider_shape == CIRCLE && b_collider.collider_shape == CIRCLE){
         res = collision_check_circles(a_collider.circle, a_pos, b_collider.circle, b_pos);
     } 
-    else if(a_collider.type == RECT_COLLIDER && b_collider.type == RECT_COLLIDER){
+    else if(a_collider.collider_shape == RECT && b_collider.collider_shape == RECT){
         res = collision_check_rects(a_collider.rect, a_pos, a_angle, b_collider.rect, b_pos, b_angle);
     }
-    else if(a_collider.type == RECT_COLLIDER && b_collider.type == CIRCLE_COLLIDER){
+    else if(a_collider.collider_shape == RECT && b_collider.collider_shape == CIRCLE){
         res = collision_check_rect_circle(a_collider.rect, a_pos, a_angle, b_collider.circle, b_pos);
     }
-    else if(a_collider.type == CIRCLE_COLLIDER && b_collider.type == RECT_COLLIDER){
+    else if(a_collider.collider_shape == CIRCLE && b_collider.collider_shape == RECT){
         res = collision_check_rect_circle(b_collider.rect, b_pos, b_angle, a_collider.circle, a_pos);
         res.normal_vec = vec_2d_scale(res.normal_vec, -1.0f);
     }

@@ -3,7 +3,7 @@
 
 #include "rigidbody.h"
 #include "staticbody.h"
-// #include "softbody.h"
+#include "softbody.h"
 #include "collision.h"
 
 

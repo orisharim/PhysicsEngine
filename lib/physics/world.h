@@ -7,7 +7,8 @@
 typedef enum {
     RIGIDBODY,
     STATICBODY,
-    
+    SOFTBODY,
+    SPRING
 } PhysicsObjectType;
 
 typedef struct {
@@ -15,7 +16,8 @@ typedef struct {
     union {
         Rigidbody2D* rigidbody;
         Staticbody2D* staticbody;
-        
+        Softbody2D* softbody;
+        Spring2D* spring;
     };
 } PhysicsObject;
 
@@ -36,7 +38,9 @@ PhysicsObject* world_2d_add_object(World2D* world, PhysicsObject* obj);
 void world_2d_remove_object(World2D* world, PhysicsObject* obj);
 
 PhysicsObject* world_2d_add_rigid_body(World2D* world, Rigidbody2D* rb);
-PhysicsObject* world_2d_add_static_body(World2D* world, Staticbody2D* rb);
+PhysicsObject* world_2d_add_static_body(World2D* world, Staticbody2D* sb);
+PhysicsObject* world_2d_add_soft_body(World2D* world, Softbody2D* sb);
+PhysicsObject* world_2d_add_spring(World2D* world, Spring2D* sp);
 
 CollisionResult world_2d_check_objects_collision(PhysicsObject* a, PhysicsObject* b);
 CollisionResult world_2d_check_collision_rigid_body_rigid_body(Rigidbody2D* a, Rigidbody2D* b);

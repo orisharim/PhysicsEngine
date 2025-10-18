@@ -1,14 +1,9 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
+#include "geometry_utils.h"
 #include "vector2.h"
 #include <stdbool.h>
-
-typedef enum {
-    RECT_COLLIDER,
-    CIRCLE_COLLIDER,
-    POLYGON_COLLIDER
-} Collider2DType;
 
 typedef struct RectCollider {
     float width;
@@ -32,7 +27,7 @@ typedef struct CollisionResult {
 
 typedef struct Collider2D {
 
-    Collider2DType type;
+    Shape2D collider_shape;
     union{
         CircleCollider circle;
         RectCollider rect;
